@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\FodyTools\FodyTools\CodeImporter.cs" Link="CodeImporter.cs" />
+    <Compile Include="..\..\FodyTools\FodyTools\ILogger.cs" Link="ILogger.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FodyHelpers" Version="3.2.9" />
   </ItemGroup>
 

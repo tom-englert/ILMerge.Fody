@@ -1,0 +1,4 @@
+[submodule "FodyTools"]
+	path = FodyTools
+	url = https://github.com/tom-englert/FodyTools.git
+	branch = master
