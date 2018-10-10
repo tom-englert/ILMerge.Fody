@@ -1,6 +1,7 @@
 ﻿namespace ILMerge.Fody
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using FodyTools;
@@ -12,6 +13,8 @@
         public override void Execute()
         {
             var module = ModuleDefinition;
+
+            Debugger.Launch();
 
             var codeImporter = new CodeImporter(module) { ModuleResolver = new LocalReferenceModuleResolver() };
 
@@ -122,7 +125,6 @@
                     attribute.ConstructorArguments[index] = new CustomAttributeArgument(attribute.ConstructorArguments[index].Type, attribute.ConstructorArguments[index].Value);
                 }
             }
-
         }
 
         public override IEnumerable<string> GetAssembliesForScanning()
