@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <Authors>tom-englert</Authors>
+    <Company>tom-englert.de</Company>
+    <Copyright>Copyright © tom-englert.de 2018. Distributed under the MIT License.</Copyright>
+    <Product>ILMerge.Fody</Product>
+    <Version>0.9</Version>
+    <PackageTags>ILWeaving, Fody, Cecil, ILMerge</PackageTags>
+    <Description>Merges the referenced types of local dependencies as private types into the target assembly, and removes the references to the local dependencies.</Description>
+    <PackageLicenseUrl>https://raw.github.com/tom-englert/ILMerge.Fody/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/tom-englert/ILMerge.Fody</PackageProjectUrl>
+    <PackageIconUrl>https://raw.github.com/tom-englert/ILMerge.Fody/master/package_icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/tom-englert/ILMerge.Fody.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageOutputPath>$(SolutionDir)Deploy</PackageOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>client</TargetFrameworkProfile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'portable40-net40+sl5+win8+wp8+wpa81'">
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='portable40-net40+sl5+win8+wp8+wpa81'">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="*" PrivateAssets="All" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="*" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

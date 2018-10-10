@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.0;portable40-net40+sl5+win8+wp8+wpa81</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>ILMerge.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FodyPackaging" Version="3.2.9" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="3.2.9" PrivateAssets="None" />
+  </ItemGroup>
+
+</Project>
