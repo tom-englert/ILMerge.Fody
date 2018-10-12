@@ -1,62 +1,94 @@
-﻿namespace ILMerge.Fody
+﻿#define LAUNCH_DEBUGGER
+
+namespace ILMerge.Fody
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
     using FodyTools;
 
+    using JetBrains.Annotations;
+
     using Mono.Cecil;
+    using Mono.Collections.Generic;
 
     public class ModuleWeaver : LoggingBaseModuleWeaver
     {
+        [NotNull]
+        public override IEnumerable<string> GetAssembliesForScanning() => Enumerable.Empty<string>();
+
+        public override bool ShouldCleanReference => true;
+
         public override void Execute()
         {
+#if DEBUG && LAUNCH_DEBUGGER && NETFRAMEWORK
+            System.Diagnostics.Debugger.Launch();
+#endif
             var module = ModuleDefinition;
 
-            Debugger.Launch();
+            var includesPattern = ReadConfigValue("Include");
+            var excludesPattern = ReadConfigValue("Exclude");
 
-            var codeImporter = new CodeImporter(module) { ModuleResolver = new LocalReferenceModuleResolver() };
+            var codeImporter = new CodeImporter(module)
+            {
+                ModuleResolver = new LocalReferenceModuleResolver(this, ReferenceCopyLocalPaths, includesPattern, excludesPattern)
+            };
 
-            var types = module.Types.ToArray();
+            var existingTypes = module.Types.ToArray();
 
             MergeAttributes(codeImporter, module);
             MergeAttributes(codeImporter, module.Assembly);
 
-            foreach (var type in types)
+            foreach (var typeDefinition in existingTypes)
             {
-                MergeAttributes(codeImporter, type);
+                MergeAttributes(codeImporter, typeDefinition);
+                MergeGenericParameters(codeImporter, typeDefinition);
 
-                foreach (var fieldDefinition in type.Fields)
+                typeDefinition.BaseType = codeImporter.Import(typeDefinition.BaseType);
+
+                foreach (var fieldDefinition in typeDefinition.Fields)
                 {
-                    fieldDefinition.FieldType = codeImporter.Import(fieldDefinition.FieldType);
                     MergeAttributes(codeImporter, fieldDefinition);
+                    fieldDefinition.FieldType = codeImporter.Import(fieldDefinition.FieldType);
                 }
 
-                foreach (var eventDefinition in type.Events)
+                foreach (var eventDefinition in typeDefinition.Events)
                 {
-                    eventDefinition.EventType = codeImporter.Import(eventDefinition.EventType);
                     MergeAttributes(codeImporter, eventDefinition);
+                    eventDefinition.EventType = codeImporter.Import(eventDefinition.EventType);
                 }
 
-                foreach (var propertyDefinition in type.Properties)
+                foreach (var propertyDefinition in typeDefinition.Properties)
                 {
-                    propertyDefinition.PropertyType = codeImporter.Import(propertyDefinition.PropertyType);
                     MergeAttributes(codeImporter, propertyDefinition);
+
+                    propertyDefinition.PropertyType = codeImporter.Import(propertyDefinition.PropertyType);
 
                     if (!propertyDefinition.HasParameters)
                         continue;
 
                     foreach (var parameter in propertyDefinition.Parameters)
                     {
+                        MergeAttributes(codeImporter, parameter);
                         parameter.ParameterType = codeImporter.Import(parameter.ParameterType);
                     }
                 }
 
-                foreach (var methodDefinition in type.Methods)
+                foreach (var methodDefinition in typeDefinition.Methods)
                 {
-                    methodDefinition.ReturnType = codeImporter.Import(methodDefinition.ReturnType);
                     MergeAttributes(codeImporter, methodDefinition);
+                    MergeGenericParameters(codeImporter, methodDefinition);
+
+                    methodDefinition.ReturnType = codeImporter.Import(methodDefinition.ReturnType);
+
+                    foreach (var parameter in methodDefinition.Parameters)
+                    {
+                        MergeAttributes(codeImporter, parameter);
+                        parameter.ParameterType = codeImporter.Import(parameter.ParameterType);
+                    }
 
                     var methodBody = methodDefinition.Body;
                     if (methodBody == null)
@@ -75,17 +107,16 @@
                                 break;
 
                             case GenericInstanceMethod genericInstanceMethod:
-                                for (var index = 0; index < genericInstanceMethod.GenericArguments.Count; index++)
-                                {
-                                    genericInstanceMethod.GenericArguments[index] = codeImporter.Import(genericInstanceMethod.GenericArguments[index]);
-                                }
-
-                                genericInstanceMethod.ReturnType = codeImporter.Import(genericInstanceMethod.ReturnType);
+                                instruction.Operand = codeImporter.ImportGenericInstanceMethod(genericInstanceMethod);
                                 break;
 
-                            case MethodReference sourceMethodReference:
-                                sourceMethodReference.DeclaringType = codeImporter.Import(sourceMethodReference.DeclaringType);
-                                sourceMethodReference.ReturnType = codeImporter.Import(sourceMethodReference.ReturnType);
+                            case MethodReference methodReference:
+                                methodReference.DeclaringType = codeImporter.Import(methodReference.DeclaringType);
+                                methodReference.ReturnType = codeImporter.Import(methodReference.ReturnType);
+                                foreach (var parameter in methodReference.Parameters)
+                                {
+                                    parameter.ParameterType = codeImporter.Import(parameter.ParameterType);
+                                }
                                 break;
 
                             case TypeDefinition _:
@@ -108,9 +139,28 @@
             module.AssemblyReferences.RemoveAll(ar => importedAssemblyNames.Contains(ar.FullName));
         }
 
-        private void MergeAttributes(CodeImporter codeImporter, ICustomAttributeProvider attributeProvider)
+        private static void MergeGenericParameters(CodeImporter codeImporter, IGenericParameterProvider provider)
         {
-            if (!attributeProvider.HasCustomAttributes)
+            if (provider?.HasGenericParameters != true)
+                return;
+
+            foreach (var parameter in provider.GenericParameters)
+            {
+                MergeTypes(codeImporter, parameter.Constraints);
+            }
+        }
+
+        private static void MergeTypes(CodeImporter codeImporter, [NotNull] IList<TypeReference> types)
+        {
+            for (int i = 0; i < types.Count; i++)
+            {
+                types[i] = codeImporter.Import(types[i]);
+            }
+        }
+
+        private static void MergeAttributes(CodeImporter codeImporter, ICustomAttributeProvider attributeProvider)
+        {
+            if (attributeProvider?.HasCustomAttributes != true)
                 return;
 
             foreach (var attribute in attributeProvider.CustomAttributes)
@@ -127,9 +177,78 @@
             }
         }
 
-        public override IEnumerable<string> GetAssembliesForScanning()
+        private string ReadConfigValue(string name)
         {
-            yield break;
+            var customAttributes = ModuleDefinition.Assembly.CustomAttributes;
+            var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}AssembliesAttribute");
+            if (attribute != null)
+            {
+                customAttributes.Remove(attribute);
+                return attribute.ConstructorArguments.FirstOrDefault().Value as string;
+            }
+
+            return Config.Attribute(name)?.Value ?? Config.Descendants(name).SingleOrDefault()?.Value;
+        }
+
+        private class LocalReferenceModuleResolver : IModuleResolver
+        {
+            [NotNull]
+            private readonly ILogger _logger;
+            [CanBeNull]
+            private readonly Regex _includes;
+            [CanBeNull]
+            private readonly Regex _excludes;
+            [NotNull]
+            private readonly HashSet<string> _referenceCopyLocalPaths;
+            [NotNull]
+            private readonly HashSet<string> _ignoredAssemblyNames = new HashSet<string>();
+
+            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referenceCopyLocalPaths, string includesPattern, string excludesPattern)
+            {
+                _logger = logger;
+                _includes = BuildRegex(includesPattern);
+                _excludes = BuildRegex(excludesPattern);
+
+                _referenceCopyLocalPaths = new HashSet<string>(referenceCopyLocalPaths, StringComparer.OrdinalIgnoreCase);
+            }
+
+            public ModuleDefinition Resolve(TypeReference typeReference, string assemblyName)
+            {
+                if (_ignoredAssemblyNames.Contains(assemblyName))
+                    return null;
+
+                var module = typeReference.Resolve().Module;
+                var moduleAssemblyName = module.Assembly.Name.Name;
+
+                if (!_referenceCopyLocalPaths.Contains(module.FileName))
+                {
+                    _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the local references list.");
+                }
+                else
+                {
+                    if (_excludes?.Match(moduleAssemblyName).Success == true)
+                    {
+                        _logger.LogInfo($"Exclude assembly {assemblyName} because its in the exclude list.");
+                    }
+                    else if (_includes?.Match(moduleAssemblyName).Success == false)
+                    {
+                        _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the include list.");
+                    }
+                    else
+                    {
+                        _logger.LogInfo($"Merge types from assembly {assemblyName}.");
+                        return module;
+                    }
+                }
+
+                _ignoredAssemblyNames.Add(assemblyName);
+                return null;
+            }
+
+            private static Regex BuildRegex(string pattern)
+            {
+                return pattern != null ? new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase) : null;
+            }
         }
     }
 }

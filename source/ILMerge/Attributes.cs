@@ -5,22 +5,22 @@
     [AttributeUsage(AttributeTargets.Assembly)]
     public class IncludeAssembliesAttribute : Attribute
     {
-        public IncludeAssembliesAttribute(params string[] includeExpressions)
+        public IncludeAssembliesAttribute(string pattern)
         {
-            IncludeExpressions = includeExpressions;
+            Pattern = pattern;
         }
 
-        public string[] IncludeExpressions { get; }
+        public string Pattern { get; }
     }
 
     [AttributeUsage(AttributeTargets.Assembly)]
     public class ExcludeAssembliesAttribute : Attribute
     {
-        public ExcludeAssembliesAttribute(params string[] excludeExpressions)
+        public ExcludeAssembliesAttribute(string pattern)
         {
-            ExcludeExpressions = excludeExpressions;
+            Pattern = pattern;
         }
 
-        public string[] ExcludeExpressions { get; }
+        public string Pattern { get; }
     }
 }

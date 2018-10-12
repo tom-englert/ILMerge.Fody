@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -14,11 +15,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="TomsToolbox.Core" Version="1.0.74" />
-    <PackageReference Include="TomsToolbox.Desktop" Version="1.0.74" />
+    <PackageReference Include="TomsToolbox.Desktop" Version="1.0.74" Condition="'$(TargetFramework)'=='net46'"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ILMerge.Fody\ILMerge.Fody.csproj" />
+    <ProjectReference Include="..\ILMerge\ILMerge.csproj" />
   </ItemGroup>
 
 </Project>
