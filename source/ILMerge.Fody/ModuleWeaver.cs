@@ -41,7 +41,6 @@ namespace ILMerge.Fody
 
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
-                ImportPropertiesAndEvents = false,
                 ModuleResolver = new LocalReferenceModuleResolver(this, references, includesPattern, excludesPattern)
             };
 
