@@ -17,10 +17,6 @@
     <PackageOutputPath>$(SolutionDir)Deploy</PackageOutputPath>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
