@@ -23,8 +23,6 @@ namespace Tests
 #if NETFRAMEWORK
     namespace NetFrameworkOnly
     {
-        using System.Reflection;
-
         using TomsToolbox.Desktop;
 
         public class UnitTest2
@@ -42,16 +40,17 @@ namespace Tests
     }
 #endif
 
-    class Reference<T1, T2> : TomsToolbox.Core.WeakEventListener<T1, T2, EventArgs>
+    // some complex class, just make sure this can be copied...
+    class SomeComplexSample<T1, T2> : TomsToolbox.Core.WeakEventListener<T1, T2, EventArgs>
         where T1 : TomsToolbox.Core.DelegateComparer<T2>
         where T2 : class, TomsToolbox.Core.ITimeService
     {
-        public Reference([NotNull] T1 target, [NotNull] T2 source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
+        public SomeComplexSample([NotNull] T1 target, [NotNull] T2 source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
             : base(target, source, onEventAction, onAttachAction, onDetachAction)
         {
         }
 
-        public Reference([NotNull] T1 target, [NotNull] TomsToolbox.Core.WeakReference<T2> source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction) 
+        public SomeComplexSample([NotNull] T1 target, [NotNull] TomsToolbox.Core.WeakReference<T2> source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction) 
             : base(target, source, onEventAction, onAttachAction, onDetachAction)
         {
         }
@@ -59,6 +58,16 @@ namespace Tests
         public T SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1) 
             where T : TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>
         {
+            var x = new AutoWeakIndexer<int, string>(i => i.ToString());
+
+            var comparer = x.Comparer;
+            var keys = x.Keys;
+
+            if (comparer != null && keys.IsReadOnly)
+            {
+                throw new Exception("never happens");
+            }
+
             return default(T);
         }
 

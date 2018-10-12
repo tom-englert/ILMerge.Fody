@@ -1,21 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\FodyTools\FodyTools\AbstractModuleWeaver.cs" Link="AbstractModuleWeaver.cs" />
     <Compile Include="..\..\FodyTools\FodyTools\CodeImporter.cs" Link="CodeImporter.cs" />
-    <Compile Include="..\..\FodyTools\FodyTools\ILogger.cs" Link="ILogger.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FodyHelpers" Version="3.2.9" />
   </ItemGroup>
 
-  <Target Name="Postbuild" AfterTargets="Build" Condition="$(TargetFramework)=='net46'">
-    <MakeDir Directories="$(SolutionDir)Tools" />
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(SolutionDir)Tools" />
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(SolutionDir)Tools" />
+  <Target Name="Postbuild" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
+    <PropertyGroup>
+      <WeaverRuntimeToken Condition="'$(TargetFramework)' == 'net46'">netclassicweaver</WeaverRuntimeToken>
+      <WeaverRuntimeToken Condition="'$(TargetFramework)' == 'netstandard2.0'">netstandardweaver</WeaverRuntimeToken>
+
+      <ToolsWeaverDestinationFolder >$(SolutionDir)Tools\$(WeaverRuntimeToken)</ToolsWeaverDestinationFolder>
+    </PropertyGroup>
+
+    <Message Text="WeaverRuntimeToken: $(WeaverRuntimeToken)" />
+
+    <MakeDir Directories="$(ToolsWeaverDestinationFolder)" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(ToolsWeaverDestinationFolder)" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(ToolsWeaverDestinationFolder)" />
   </Target>
+
 </Project>
