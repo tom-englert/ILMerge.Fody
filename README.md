@@ -34,11 +34,11 @@ Add `<ILMerge/>` to [FodyWeavers.xml](https://github.com/Fody/Fody#add-fodyweave
 
 ### Merge IL code from referenced assemblies into the main assembly
 
-This weaver was inspired by the [ILMerge Tool](https://www.microsoft.com/en-us/download/details.aspx?id=17630) by Mike Barnett from Microsoft.
+This weaver was inspired by the [ILMerge Tool](https://github.com/dotnet/ILMerge) by Mike Barnett from Microsoft.
 
 Beside the simplified usage as a Fody add in, it was designed for a slightly different usage: 
 
-- It does not merge complete assemblies, but only the types that are used. This will also save a lot of space if you use only some parts of a large library.
+- It does not merge complete assemblies, but only the types that are used. This will save a lot of space if you use only some parts of a larger library.
 - It hides the merged types by making them private, avoiding conflicts with other modules using the same code.
 
 This way you can make use of 3rd party libraries, without exposing them as references that you have to ship separately. 
@@ -49,8 +49,13 @@ You will also avoid the so called "dll hell", since all the code is now private 
 
 This Task performs the following changes
 
- * Take all assemblies that have been marked as "Copy Local" and merges the IL code into the target assembly.
- * Removes the references to the assemblies that have been merged.
+- Take all assemblies that have been marked as "Copy Local" and merges the IL code into the target assembly.
+- Removes the references to the assemblies that have been merged.
+
+## .NET Core support
+
+Since .NET Core projects do not mark references as "Coly Local", ILMerge.Fody will instead try to merge all references. 
+**Make sure to use the configuration options to exclude system libraries from being merged!**
 
 
 ## Configuration Options
