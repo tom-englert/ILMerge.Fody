@@ -26,8 +26,8 @@ namespace ILMerge.Fody
             System.Diagnostics.Debugger.Launch();
 #endif
 
-            var includesPattern = ReadConfigValue("Include");
-            var excludesPattern = ReadConfigValue("Exclude");
+            var includesPattern = ReadConfigValue("IncludeAssemblies");
+            var excludesPattern = ReadConfigValue("ExcludeAssemblies");
 
             // ReSharper disable once JoinDeclarationAndInitializer
             IList<string> references;
@@ -50,7 +50,7 @@ namespace ILMerge.Fody
         private string ReadConfigValue(string name)
         {
             var customAttributes = ModuleDefinition.Assembly.CustomAttributes;
-            var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}AssembliesAttribute");
+            var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}Attribute");
             if (attribute != null)
             {
                 customAttributes.Remove(attribute);
