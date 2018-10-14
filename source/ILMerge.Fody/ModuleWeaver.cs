@@ -22,22 +22,15 @@ namespace ILMerge.Fody
 
         public override void Execute()
         {
-#if DEBUG && LAUNCH_DEBUGGER // && NETFRAMEWORK
+#if DEBUG && LAUNCH_DEBUGGER
             System.Diagnostics.Debugger.Launch();
 #endif
 
             var includesPattern = ReadConfigValue("IncludeAssemblies");
             var excludesPattern = ReadConfigValue("ExcludeAssemblies");
+            var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
 
-            // ReSharper disable once JoinDeclarationAndInitializer
-            IList<string> references;
-
-            #if NETSTANDARD
-            references = References.Split(';');
-            #else
-            references = ReferenceCopyLocalPaths;
-            #endif
-
+            var references = isDotNetCore ? References.Split(';') : ReferenceCopyLocalPaths;
 
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
@@ -45,6 +38,11 @@ namespace ILMerge.Fody
             };
 
             codeImporter.ILMerge();
+
+            var importedReferences = new HashSet<string>(codeImporter.ListImportedModules().Select(moduleDefinition => moduleDefinition.FileName), StringComparer.OrdinalIgnoreCase);
+
+            // needs fody > 3.2.9 to work!!
+            ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(path));
         }
 
         private string ReadConfigValue(string name)
@@ -69,17 +67,17 @@ namespace ILMerge.Fody
             [CanBeNull]
             private readonly Regex _excludes;
             [NotNull]
-            private readonly HashSet<string> _referenceCopyLocalPaths;
+            private readonly HashSet<string> _referencePaths;
             [NotNull]
             private readonly HashSet<string> _ignoredAssemblyNames = new HashSet<string>();
 
-            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referenceCopyLocalPaths, string includesPattern, string excludesPattern)
+            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, string includesPattern, string excludesPattern)
             {
                 _logger = logger;
                 _includes = BuildRegex(includesPattern);
                 _excludes = BuildRegex(excludesPattern);
 
-                _referenceCopyLocalPaths = new HashSet<string>(referenceCopyLocalPaths, StringComparer.OrdinalIgnoreCase);
+                _referencePaths = new HashSet<string>(referencePaths, StringComparer.OrdinalIgnoreCase);
             }
 
             public ModuleDefinition Resolve(TypeReference typeReference, string assemblyName)
@@ -90,7 +88,7 @@ namespace ILMerge.Fody
                 var module = typeReference.Resolve().Module;
                 var moduleAssemblyName = module.Assembly.Name.Name;
 
-                if (!_referenceCopyLocalPaths.Contains(module.FileName))
+                if (!_referencePaths.Contains(module.FileName))
                 {
                     _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the local references list.");
                 }
@@ -119,6 +117,25 @@ namespace ILMerge.Fody
             {
                 return pattern != null ? new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase) : null;
             }
+        }
+    }
+
+    static class ExtensionMethods
+    {
+        public static string GetTargetFramework([NotNull] this ModuleDefinition moduleDefinition)
+        {
+            return moduleDefinition.Assembly
+                .CustomAttributes
+                .Where(attr => attr.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute")
+                .Select(attr => attr.ConstructorArguments.Select(arg => arg.Value as string).FirstOrDefault())
+                .FirstOrDefault();
+        }
+
+        public static bool IsTargetFrameworkDotNetCore([NotNull] this ModuleDefinition moduleDefinition)
+        {
+            var targetFramework = moduleDefinition.GetTargetFramework();
+
+            return targetFramework?.StartsWith(".NETCoreApp", StringComparison.OrdinalIgnoreCase) ?? false;
         }
     }
 }

@@ -40,4 +40,8 @@
     <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <WeaverFiles Include="$(SolutionDir)ILMerge.Fody\bin\$(Configuration)\Net46\ILMerge.Fody.dll" />
+  </ItemGroup>
+
 </Project>

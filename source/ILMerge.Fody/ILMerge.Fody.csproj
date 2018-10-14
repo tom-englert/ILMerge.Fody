@@ -13,19 +13,4 @@
     <PackageReference Include="FodyHelpers" Version="3.2.9" />
   </ItemGroup>
 
-  <Target Name="Postbuild" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
-    <PropertyGroup>
-      <WeaverRuntimeToken Condition="'$(TargetFramework)' == 'net46'">netclassicweaver</WeaverRuntimeToken>
-      <WeaverRuntimeToken Condition="'$(TargetFramework)' == 'netstandard2.0'">netstandardweaver</WeaverRuntimeToken>
-
-      <ToolsWeaverDestinationFolder >$(SolutionDir)Tools\$(WeaverRuntimeToken)</ToolsWeaverDestinationFolder>
-    </PropertyGroup>
-
-    <Message Text="WeaverRuntimeToken: $(WeaverRuntimeToken)" />
-
-    <MakeDir Directories="$(ToolsWeaverDestinationFolder)" />
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(ToolsWeaverDestinationFolder)" />
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(ToolsWeaverDestinationFolder)" />
-  </Target>
-
 </Project>
