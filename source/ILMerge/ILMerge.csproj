@@ -8,9 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="FodyPackaging" Version="3.2.11" PrivateAssets="All" />
-    <PackageReference Include="Fody" Version="3.2.11" PrivateAssets="all">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Fody" Version="3.2.11" PrivateAssets="None" />
   </ItemGroup>
 
   <Target Name="ClearPackageOutputPath" BeforeTargets="GenerateNuspec">

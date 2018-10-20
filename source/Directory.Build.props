@@ -6,7 +6,7 @@
     <Company>tom-englert.de</Company>
     <Copyright>Copyright © tom-englert.de 2018. Distributed under the MIT License.</Copyright>
     <Product>ILMerge.Fody</Product>
-    <Version>0.9-beta.1</Version>
+    <Version>0.9.1-beta</Version>
     <PackageTags>ILWeaving, Fody, Cecil, ILMerge</PackageTags>
     <Description>Merges the referenced types of local dependencies as private types into the target assembly, and removes the references to the local dependencies.</Description>
     <PackageLicenseUrl>https://raw.github.com/tom-englert/ILMerge.Fody/master/LICENSE</PackageLicenseUrl>
