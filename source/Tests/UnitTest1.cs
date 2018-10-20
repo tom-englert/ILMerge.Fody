@@ -29,7 +29,6 @@ namespace Tests
         {
             private DispatcherThrottle _throttle;
 
-
             [Fact]
             public void Test1()
             {
@@ -40,7 +39,7 @@ namespace Tests
     }
 #endif
 
-    // some complex class, just make sure this can be copied...
+    // some complex class, just make sure this can be handled ...
     class SomeComplexSample<T1, T2> : TomsToolbox.Core.WeakEventListener<T1, T2, EventArgs>
         where T1 : TomsToolbox.Core.DelegateComparer<T2>
         where T2 : class, TomsToolbox.Core.ITimeService

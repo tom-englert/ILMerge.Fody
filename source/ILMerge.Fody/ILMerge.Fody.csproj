@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FodyHelpers" Version="3.2.9" />
+    <PackageReference Include="FodyHelpers" Version="3.2.11" />
   </ItemGroup>
 
 </Project>

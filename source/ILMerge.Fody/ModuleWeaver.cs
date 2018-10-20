@@ -4,6 +4,7 @@ namespace ILMerge.Fody
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
 
@@ -39,10 +40,9 @@ namespace ILMerge.Fody
 
             codeImporter.ILMerge();
 
-            var importedReferences = new HashSet<string>(codeImporter.ListImportedModules().Select(moduleDefinition => moduleDefinition.FileName), StringComparer.OrdinalIgnoreCase);
+            var importedReferences = new HashSet<string>(codeImporter.ListImportedModules().Select(moduleDefinition => Path.GetFileNameWithoutExtension(moduleDefinition.FileName)), StringComparer.OrdinalIgnoreCase);
 
-            // needs fody > 3.2.9 to work!!
-            ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(path));
+            ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(Path.GetFileNameWithoutExtension(path)));
         }
 
         private string ReadConfigValue(string name)
