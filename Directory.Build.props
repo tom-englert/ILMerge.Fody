@@ -2,46 +2,12 @@
 <Project>
 
   <PropertyGroup>
-    <Authors>tom-englert</Authors>
-    <Company>tom-englert.de</Company>
-    <Copyright>Copyright © tom-englert.de 2018. Distributed under the MIT License.</Copyright>
+    <Copyright>Copyright © tom-englert.de 2017-2018. Distributed under the MIT License.</Copyright>
     <Product>ILMerge.Fody</Product>
     <Version>0.9.1-beta</Version>
-    <PackageTags>ILWeaving, Fody, Cecil, ILMerge</PackageTags>
     <Description>Merges the referenced types of local dependencies as private types into the target assembly, and removes the references to the local dependencies.</Description>
-    <PackageLicenseUrl>https://raw.github.com/tom-englert/ILMerge.Fody/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/tom-englert/ILMerge.Fody</PackageProjectUrl>
-    <PackageIconUrl>https://raw.github.com/tom-englert/ILMerge.Fody/master/package_icon.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/tom-englert/ILMerge.Fody.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageOutputPath>$(SolutionDir)Deploy</PackageOutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
-    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>client</TargetFrameworkProfile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'portable40-net40+sl5+win8+wp8+wpa81'">
-    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
-    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='portable40-net40+sl5+win8+wp8+wpa81'">
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" PrivateAssets="All" />
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <WeaverFiles Include="$(SolutionDir)ILMerge.Fody\bin\$(Configuration)\Net46\ILMerge.Fody.dll" />
-  </ItemGroup>
+  <Import Project="Common.props" />
 
 </Project>
