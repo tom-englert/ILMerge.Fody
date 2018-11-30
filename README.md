@@ -79,8 +79,6 @@ A regular expression matching the assembly names to exclude from merging.
 
 Do not include `.exe` or `.dll` in the names.
 
-Can take two forms.
-
 As an XML element:
 
 ```xml
@@ -109,8 +107,6 @@ Do not include `.exe` or `.dll` in the names.
 
 If combined with `ExcludeAssemblies`, it will only apply to items not already excluded.
 
-Can take two forms. 
-
 As an XML element:
 
 ```xml
@@ -129,5 +125,28 @@ Or as an attribute in code:
 
 ```c#
 [assembly: ILMerge.IncludeAssemblies("My.*Module|My.*Task")]
+```
+### HideImportedTypes
+
+A switch to control whether the imported types are hidden (made private) or keep their visibility unchanged. Default is 'true'
+
+As an XML element:
+
+```xml
+<ILMerge>
+  <HideImportedTypes>false</HideImportedTypes>
+</ILMerge>
+```
+
+Or as an XML attribute:
+
+```xml
+<ILMerge HideImportedTypes='false' />
+```
+
+Or as an attribute in code:
+
+```c#
+[assembly: ILMerge.HideImportedTypes(false)]
 ```
 
