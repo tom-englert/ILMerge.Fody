@@ -1,19 +1,19 @@
 ﻿// #define LAUNCH_DEBUGGER
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Xml;
+using Fody;
+using FodyTools;
+using JetBrains.Annotations;
+using Mono.Cecil;
+
 namespace ILMerge.Fody
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-
-    using FodyTools;
-
-    using JetBrains.Annotations;
-
-    using Mono.Cecil;
-
     public class ModuleWeaver : AbstractModuleWeaver
     {
         [NotNull]
@@ -27,15 +27,18 @@ namespace ILMerge.Fody
             System.Diagnostics.Debugger.Launch();
 #endif
 
-            var includesPattern = ReadConfigValue("IncludeAssemblies");
-            var excludesPattern = ReadConfigValue("ExcludeAssemblies");
+            var includesPattern = ReadConfigValue("IncludeAssemblies", string.Empty);
+            var excludesPattern = ReadConfigValue("ExcludeAssemblies", string.Empty);
+            var hideImportedTypes = ReadConfigValue("HideImportedTypes", true);
+
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
 
             var references = isDotNetCore ? References.Split(';') : ReferenceCopyLocalPaths;
 
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
-                ModuleResolver = new LocalReferenceModuleResolver(this, references, includesPattern, excludesPattern)
+                ModuleResolver = new LocalReferenceModuleResolver(this, references, includesPattern, excludesPattern),
+                HideImportedTypes = hideImportedTypes
             };
 
             codeImporter.ILMerge();
@@ -45,17 +48,29 @@ namespace ILMerge.Fody
             ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(Path.GetFileNameWithoutExtension(path)));
         }
 
-        private string ReadConfigValue(string name)
+        private string ReadConfigValue(string name, string defaultValue)
         {
             var customAttributes = ModuleDefinition.Assembly.CustomAttributes;
             var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}Attribute");
             if (attribute != null)
             {
                 customAttributes.Remove(attribute);
-                return attribute.ConstructorArguments.FirstOrDefault().Value as string;
+                return attribute.ConstructorArguments.FirstOrDefault().Value.ToString();
             }
 
-            return Config.Attribute(name)?.Value ?? Config.Descendants(name).SingleOrDefault()?.Value;
+            return Config.Attribute(name)?.Value ?? Config.Descendants(name).SingleOrDefault()?.Value ?? defaultValue;
+        }
+
+        private bool ReadConfigValue(string name, bool defaultValue)
+        {
+            try
+            {
+                return XmlConvert.ToBoolean((ReadConfigValue(name, defaultValue.ToString(CultureInfo.InvariantCulture)) ?? defaultValue.ToString()).ToLowerInvariant());
+            }
+            catch (Exception ex)
+            {
+                throw new WeavingException($"Error parsing the configuration value '{name}'");
+            }
         }
 
         private class LocalReferenceModuleResolver : IModuleResolver
@@ -115,7 +130,14 @@ namespace ILMerge.Fody
 
             private static Regex BuildRegex(string pattern)
             {
-                return pattern != null ? new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase) : null;
+                try
+                {
+                    return string.IsNullOrEmpty(pattern) ? null : new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                }
+                catch (Exception ex)
+                {
+                    throw new WeavingException($"Error parsing the regular expression '{pattern}': {ex.Message}");
+                }
             }
         }
     }

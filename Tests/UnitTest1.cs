@@ -1,4 +1,5 @@
 [assembly: ILMerge.IncludeAssemblies("TomsToolbox")]
+[assembly: ILMerge.HideImportedTypes(false)]
 
 namespace Tests
 {

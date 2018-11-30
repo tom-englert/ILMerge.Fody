@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FodyPackaging" Version="3.2.16" PrivateAssets="All" />
-    <PackageReference Include="Fody" Version="3.2.16" PrivateAssets="None" />
+    <PackageReference Include="FodyPackaging" Version="3.3.2" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="3.3.2" PrivateAssets="None" />
   </ItemGroup>
 
 </Project>
