@@ -100,27 +100,30 @@ namespace ILMerge.Fody
                 if (_ignoredAssemblyNames.Contains(assemblyName))
                     return null;
 
-                var module = typeReference.Resolve().Module;
-                var moduleAssemblyName = module.Assembly.Name.Name;
+                var module = typeReference.Resolve()?.Module;
+                if (module != null)
+                {
+                    var moduleAssemblyName = module.Assembly.Name.Name;
 
-                if (!_referencePaths.Contains(module.FileName))
-                {
-                    _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the local references list.");
-                }
-                else
-                {
-                    if (_excludes?.Match(moduleAssemblyName).Success == true)
+                    if (!_referencePaths.Contains(module.FileName))
                     {
-                        _logger.LogInfo($"Exclude assembly {assemblyName} because its in the exclude list.");
-                    }
-                    else if (_includes?.Match(moduleAssemblyName).Success == false)
-                    {
-                        _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the include list.");
+                        _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the local references list.");
                     }
                     else
                     {
-                        _logger.LogInfo($"Merge types from assembly {assemblyName}.");
-                        return module;
+                        if (_excludes?.Match(moduleAssemblyName).Success == true)
+                        {
+                            _logger.LogInfo($"Exclude assembly {assemblyName} because its in the exclude list.");
+                        }
+                        else if (_includes?.Match(moduleAssemblyName).Success == false)
+                        {
+                            _logger.LogInfo($"Exclude assembly {assemblyName} because its not in the include list.");
+                        }
+                        else
+                        {
+                            _logger.LogInfo($"Merge types from assembly {assemblyName}.");
+                            return module;
+                        }
                     }
                 }
 
