@@ -72,12 +72,7 @@ Default FodyWeavers.xml:
 </Weavers>
 ```
 
-
-### ExcludeAssemblies
-
-A regular expression matching the assembly names to exclude from merging.
-
-Do not include `.exe` or `.dll` in the names.
+Options can be written in attribute or element form, or as an attribute in code:
 
 As an XML element:
 
@@ -99,6 +94,17 @@ Or as an attribute in code:
 [assembly: ILMerge.ExcludeAssemblies("xunit|newtonsoft")]
 ```
 
+### ExcludeAssemblies
+
+A regular expression matching the assembly names to exclude from merging.
+
+Do not include `.exe` or `.dll` in the names.
+
+e.g.
+```xml
+<ILMerge ExcludeAssemblies='xunit|newtonsoft' />
+```
+
 ### IncludeAssemblies
 
 A regular expression matching the assembly names to include in merging.
@@ -107,46 +113,41 @@ Do not include `.exe` or `.dll` in the names.
 
 If combined with `ExcludeAssemblies`, it will only apply to items not already excluded.
 
-As an XML element:
-
-```xml
-<ILMerge>
-  <IncludeAssemblies>My.*Module|My.*Task</IncludeAssemblies>
-</ILMerge>
-```
-
-Or as an XML attribute:
-
+e.g.
 ```xml
 <ILMerge IncludeAssemblies='My.*Module|My.*Task' />
 ```
 
-Or as an attribute in code:
+### ExcludeResources
 
-```c#
-[assembly: ILMerge.IncludeAssemblies("My.*Module|My.*Task")]
+A regular expression matching the resource names to exclude from merging.
+
+Resource names are case sensitive.
+
+e.g.
+```xml
+<ILMerge ExcludeResources='\.resources$' />
 ```
+
+### IncludeResources
+
+A regular expression matching the resource names to include in merging.
+
+Resource names are case sensitive.
+
+If combined with `ExcludeResources`, it will only apply to items not already excluded.
+
+e.g.
+```xml
+<ILMerge IncludeResources='\.resources$' />
+```
+
 ### HideImportedTypes
 
 A switch to control whether the imported types are hidden (made private) or keep their visibility unchanged. Default is 'true'
 
-As an XML element:
-
-```xml
-<ILMerge>
-  <HideImportedTypes>false</HideImportedTypes>
-</ILMerge>
-```
-
-Or as an XML attribute:
+e.g.
 
 ```xml
 <ILMerge HideImportedTypes='false' />
 ```
-
-Or as an attribute in code:
-
-```c#
-[assembly: ILMerge.HideImportedTypes(false)]
-```
-
