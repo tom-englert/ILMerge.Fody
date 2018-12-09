@@ -45,6 +45,48 @@ namespace ILMerge
     }
 
     /// <summary>
+    /// A regular expression matching the resource names to include in merging.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class IncludeResourcesAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IncludeResourcesAttribute"/> class.
+        /// </summary>
+        /// <param name="pattern">The regular expression pattern.</param>
+        public IncludeResourcesAttribute(string pattern)
+        {
+            Pattern = pattern;
+        }
+
+        /// <summary>
+        /// Gets the regular expression pattern.
+        /// </summary>
+        public string Pattern { get; }
+    }
+
+    /// <summary>
+    /// A regular expression matching the resource names to exclude from merging.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class ExcludeResourcesAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExcludeResourcesAttribute"/> class.
+        /// </summary>
+        /// <param name="pattern">The regular expression pattern.</param>
+        public ExcludeResourcesAttribute(string pattern)
+        {
+            Pattern = pattern;
+        }
+
+        /// <summary>
+        /// Gets the regular expression pattern.
+        /// </summary>
+        public string Pattern { get; }
+    }
+
+    /// <summary>
     /// A switch to control whether the imported types are hidden (made private) or keep their visibility unchanged. Default is 'true'
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]

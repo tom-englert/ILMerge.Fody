@@ -27,8 +27,10 @@ namespace ILMerge.Fody
             System.Diagnostics.Debugger.Launch();
 #endif
 
-            var includesPattern = ReadConfigValue("IncludeAssemblies", string.Empty);
-            var excludesPattern = ReadConfigValue("ExcludeAssemblies", string.Empty);
+            var includeAssemblies = BuildRegex(ReadConfigValue("IncludeAssemblies", string.Empty));
+            var excludeAssemblies = BuildRegex(ReadConfigValue("ExcludeAssemblies", string.Empty));
+            var includeResources = BuildRegex(ReadConfigValue("IncludeResources", string.Empty));
+            var excludeResources = BuildRegex(ReadConfigValue("ExcludeResources", string.Empty));
             var hideImportedTypes = ReadConfigValue("HideImportedTypes", true);
 
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
@@ -37,15 +39,42 @@ namespace ILMerge.Fody
 
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
-                ModuleResolver = new LocalReferenceModuleResolver(this, references, includesPattern, excludesPattern),
+                ModuleResolver = new LocalReferenceModuleResolver(this, references, includeAssemblies, excludeAssemblies),
                 HideImportedTypes = hideImportedTypes
             };
 
             codeImporter.ILMerge();
 
-            var importedReferences = new HashSet<string>(codeImporter.ListImportedModules().Select(moduleDefinition => Path.GetFileNameWithoutExtension(moduleDefinition.FileName)), StringComparer.OrdinalIgnoreCase);
+            var importedModules = codeImporter.ListImportedModules();
+
+            ImportResources(ModuleDefinition, importedModules, includeResources, excludeResources, this);
+
+            var importedReferences = new HashSet<string>(importedModules.Select(moduleDefinition => Path.GetFileNameWithoutExtension(moduleDefinition.FileName)), StringComparer.OrdinalIgnoreCase);
 
             ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(Path.GetFileNameWithoutExtension(path)));
+        }
+
+        private static void ImportResources([NotNull] ModuleDefinition targetModule, [NotNull, ItemNotNull] IEnumerable<ModuleDefinition> importedModules, [CanBeNull] Regex includeResources, [CanBeNull] Regex excludeResources, [NotNull] ILogger logger)
+        {
+            foreach (var resource in importedModules.SelectMany(module => module.Resources.OfType<EmbeddedResource>()))
+            {
+                var resourceName = resource.Name;
+
+                if (excludeResources?.Match(resourceName).Success == true)
+                {
+                    logger.LogInfo($"Exclude resource {resourceName} because its in the exclude list.");
+                }
+                else if (includeResources?.Match(resourceName).Success == false)
+                {
+                    logger.LogInfo($"Exclude resource {resourceName} because its not in the include list.");
+                }
+                else
+                {
+                    logger.LogInfo($"Merge resource {resourceName}.");
+
+                    targetModule.Resources.Add(resource);
+                }
+            }
         }
 
         private string ReadConfigValue(string name, string defaultValue)
@@ -73,6 +102,18 @@ namespace ILMerge.Fody
             }
         }
 
+        private static Regex BuildRegex(string pattern)
+        {
+            try
+            {
+                return string.IsNullOrEmpty(pattern) ? null : new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                throw new WeavingException($"Error parsing the regular expression '{pattern}': {ex.Message}");
+            }
+        }
+
         private class LocalReferenceModuleResolver : IModuleResolver
         {
             [NotNull]
@@ -86,11 +127,11 @@ namespace ILMerge.Fody
             [NotNull]
             private readonly HashSet<string> _ignoredAssemblyNames = new HashSet<string>();
 
-            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, string includesPattern, string excludesPattern)
+            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, Regex includes, Regex excludes)
             {
                 _logger = logger;
-                _includes = BuildRegex(includesPattern);
-                _excludes = BuildRegex(excludesPattern);
+                _includes = includes;
+                _excludes = excludes;
 
                 _referencePaths = new HashSet<string>(referencePaths, StringComparer.OrdinalIgnoreCase);
             }
@@ -129,18 +170,6 @@ namespace ILMerge.Fody
 
                 _ignoredAssemblyNames.Add(assemblyName);
                 return null;
-            }
-
-            private static Regex BuildRegex(string pattern)
-            {
-                try
-                {
-                    return string.IsNullOrEmpty(pattern) ? null : new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                }
-                catch (Exception ex)
-                {
-                    throw new WeavingException($"Error parsing the regular expression '{pattern}': {ex.Message}");
-                }
             }
         }
     }
