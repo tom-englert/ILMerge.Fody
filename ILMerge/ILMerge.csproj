@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FodyPackaging" Version="3.3.2" PrivateAssets="All" />
-    <PackageReference Include="Fody" Version="3.3.2" PrivateAssets="None" />
+    <None Include="..\LICENSE" Link="LICENSE" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FodyPackaging" Version="3.3.5" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="3.3.5" PrivateAssets="None" />
   </ItemGroup>
 
 </Project>
