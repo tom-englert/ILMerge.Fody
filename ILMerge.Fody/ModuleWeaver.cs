@@ -98,7 +98,7 @@ namespace ILMerge.Fody
             }
             catch (Exception ex)
             {
-                throw new WeavingException($"Error parsing the configuration value '{name}'");
+                throw new WeavingException($"Error parsing the configuration value '{name}': {ex.Message}");
             }
         }
 

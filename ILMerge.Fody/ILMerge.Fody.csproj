@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="..\FodyTools\FodyTools\AbstractModuleWeaver.cs" Link="AbstractModuleWeaver.cs" />
     <Compile Include="..\FodyTools\FodyTools\CodeImporter.cs" Link="CodeImporter.cs" />
+    <Compile Include="..\FodyTools\FodyTools\CollectionExtensionMethods.cs" Link="CollectionExtensionMethods.cs" />
     <Compile Include="..\FodyTools\FodyTools\TypeSystemExtensionMethods.cs" Link="TypeSystemExtensionMethods.cs" />
   </ItemGroup>
 
