@@ -7,6 +7,7 @@
     <Title Condition="'$(Title)' == ''">$(Product)</Title>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GitHubOrganization>tom-englert</GitHubOrganization>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
