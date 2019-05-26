@@ -8,6 +8,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GitHubOrganization>tom-englert</GitHubOrganization>
     <LangVersion>latest</LangVersion>
+    <PackageOutputPath Condition="'$(PackageOutputPath)' == ''">$(SolutionDir)nugets</PackageOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
