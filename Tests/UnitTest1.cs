@@ -1,3 +1,6 @@
+// ReSharper disable RedundantNameQualifier
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedVariable
 [assembly: ILMerge.IncludeAssemblies("TomsToolbox")]
 [assembly: ILMerge.HideImportedTypes(false)]
 
@@ -50,12 +53,13 @@ namespace Tests
         {
         }
 
-        public SomeComplexSample([NotNull] T1 target, [NotNull] TomsToolbox.Core.WeakReference<T2> source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction) 
+        public SomeComplexSample([NotNull] T1 target, [NotNull] TomsToolbox.Core.WeakReference<T2> source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
             : base(target, source, onEventAction, onAttachAction, onDetachAction)
         {
         }
 
-        public T SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1) 
+        [CanBeNull]
+        public T SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1)
             where T : TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>
         {
             var x = new AutoWeakIndexer<int, string>(i => i.ToString());

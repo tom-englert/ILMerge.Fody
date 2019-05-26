@@ -77,7 +77,8 @@ namespace ILMerge.Fody
             }
         }
 
-        private string ReadConfigValue(string name, string defaultValue)
+        [NotNull]
+        private string ReadConfigValue([NotNull] string name, [NotNull] string defaultValue)
         {
             var customAttributes = ModuleDefinition.Assembly.CustomAttributes;
             var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}Attribute");
@@ -94,14 +95,15 @@ namespace ILMerge.Fody
         {
             try
             {
-                return XmlConvert.ToBoolean((ReadConfigValue(name, defaultValue.ToString(CultureInfo.InvariantCulture)) ?? defaultValue.ToString()).ToLowerInvariant());
+                return XmlConvert.ToBoolean(ReadConfigValue(name, defaultValue.ToString(CultureInfo.InvariantCulture)).ToLowerInvariant());
             }
-            catch (Exception ex)
+            catch
             {
-                throw new WeavingException($"Error parsing the configuration value '{name}': {ex.Message}");
+                throw new WeavingException($"Error parsing the configuration value '{name}'");
             }
         }
 
+        [CanBeNull]
         private static Regex BuildRegex(string pattern)
         {
             try
@@ -127,7 +129,7 @@ namespace ILMerge.Fody
             [NotNull]
             private readonly HashSet<string> _ignoredAssemblyNames = new HashSet<string>();
 
-            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, Regex includes, Regex excludes)
+            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, [CanBeNull] Regex includes, [CanBeNull] Regex excludes)
             {
                 _logger = logger;
                 _includes = includes;
@@ -136,6 +138,7 @@ namespace ILMerge.Fody
                 _referencePaths = new HashSet<string>(referencePaths, StringComparer.OrdinalIgnoreCase);
             }
 
+            [CanBeNull]
             public ModuleDefinition Resolve(TypeReference typeReference, string assemblyName)
             {
                 if (_ignoredAssemblyNames.Contains(assemblyName))
@@ -176,6 +179,7 @@ namespace ILMerge.Fody
 
     static class ExtensionMethods
     {
+        [CanBeNull]
         public static string GetTargetFramework([NotNull] this ModuleDefinition moduleDefinition)
         {
             return moduleDefinition.Assembly

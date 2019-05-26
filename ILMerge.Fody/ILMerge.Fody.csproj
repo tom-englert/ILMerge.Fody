@@ -13,11 +13,14 @@
     <Compile Include="..\FodyTools\FodyTools\AbstractModuleWeaver.cs" Link="AbstractModuleWeaver.cs" />
     <Compile Include="..\FodyTools\FodyTools\CodeImporter.cs" Link="CodeImporter.cs" />
     <Compile Include="..\FodyTools\FodyTools\CollectionExtensionMethods.cs" Link="CollectionExtensionMethods.cs" />
+    <Compile Include="..\FodyTools\FodyTools\MemberExtensionMethods.cs" Link="MemberExtensionMethods.cs" />
     <Compile Include="..\FodyTools\FodyTools\TypeSystemExtensionMethods.cs" Link="TypeSystemExtensionMethods.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FodyHelpers" Version="3.3.5" />
+    <PackageReference Include="FodyHelpers" Version="4.2.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
