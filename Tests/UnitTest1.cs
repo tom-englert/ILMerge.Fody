@@ -72,7 +72,7 @@ namespace Tests
                 throw new Exception("never happens");
             }
 
-            return default(T);
+            return default;
         }
 
         public void AnotherMethod()
