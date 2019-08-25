@@ -24,12 +24,23 @@ namespace Tests
         }
     }
 
+    public class UnitTest2
+    {
+        private readonly Type _t = typeof(SomeComplexSample<DelegateComparer<TomsToolbox.Core.ITimeService>, TomsToolbox.Core.ITimeService>);
+
+        [Fact]
+        public void Test()
+        {
+            Assert.True(_t.Assembly == typeof(UnitTest1).Assembly);
+        }
+    }
+
 #if NETFRAMEWORK
     namespace NetFrameworkOnly
     {
         using TomsToolbox.Desktop;
 
-        public class UnitTest2
+        public class UnitTest3
         {
             private DispatcherThrottle _throttle;
 

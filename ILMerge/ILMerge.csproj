@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40-client;portable40-net40+sl5+win8+wp8+wpa81;netstandard1.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net40-client;net45;netstandard1.0;netstandard2.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Common.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FodyPackaging" Version="4.2.1" PrivateAssets="All" />
-    <PackageReference Include="Fody" Version="4.2.1" PrivateAssets="None" />
+    <PackageReference Include="FodyPackaging" Version="6.0.0" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="6.0.0" PrivateAssets="None" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
-    <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" PrivateAssets="All"/>
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
