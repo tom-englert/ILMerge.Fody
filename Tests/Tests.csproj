@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
-    <!--<TargetFrameworks>netcoreapp2.0</TargetFrameworks>-->
-    <!--TargetFrameworks>net46</TargetFrameworks>-->
+    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -13,13 +11,17 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="all" />
     <PackageReference Include="TomsToolbox.Core" Version="1.0.75" />
-    <PackageReference Include="TomsToolbox.Desktop" Version="1.0.75" Condition="'$(TargetFramework)'=='net46'" />
+    <PackageReference Include="TomsToolbox.Desktop" Version="1.0.75" Condition="'$(TargetFramework)'=='net472'" />
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ILMerge.Fody\ILMerge.Fody.csproj" />
     <ProjectReference Include="..\ILMerge\ILMerge.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WeaverFiles Include="$(SolutionDir)$(SolutionName)\bin\$(Configuration)\net472\$(SolutionName).dll" />
   </ItemGroup>
 
 </Project>
