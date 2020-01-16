@@ -1,4 +1,4 @@
-﻿// #define LAUNCH_DEBUGGER
+﻿#define LAUNCH_DEBUGGER
 
 using System;
 using System.Collections.Generic;
@@ -32,6 +32,8 @@ namespace ILMerge.Fody
             var includeResources = BuildRegex(ReadConfigValue("IncludeResources", string.Empty));
             var excludeResources = BuildRegex(ReadConfigValue("ExcludeResources", string.Empty));
             var hideImportedTypes = ReadConfigValue("HideImportedTypes", true);
+            var namespacePrefix = ReadConfigValue("NamespacePrefix", string.Empty);
+            var fullImport = ReadConfigValue("FullImport", false);
 
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
 
@@ -40,18 +42,46 @@ namespace ILMerge.Fody
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
                 ModuleResolver = new LocalReferenceModuleResolver(this, references, includeAssemblies, excludeAssemblies),
-                HideImportedTypes = hideImportedTypes
+                HideImportedTypes = hideImportedTypes,
+                NamespaceDecorator = name => namespacePrefix + name
             };
 
             codeImporter.ILMerge();
 
             var importedModules = codeImporter.ListImportedModules();
 
+            if (fullImport)
+            {
+                importedModules = ImportRemainingTypes(importedModules, codeImporter);
+            }
+
             ImportResources(ModuleDefinition, importedModules, includeResources, excludeResources, this);
 
             var importedReferences = new HashSet<string>(importedModules.Select(moduleDefinition => Path.GetFileNameWithoutExtension(moduleDefinition.FileName)), StringComparer.OrdinalIgnoreCase);
 
             ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(Path.GetFileNameWithoutExtension(path)));
+        }
+
+        private static ICollection<ModuleDefinition> ImportRemainingTypes(ICollection<ModuleDefinition> importedModules, CodeImporter codeImporter)
+        {
+            var updatedModules = new HashSet<ModuleDefinition>();
+
+            while (true)
+            {
+                var modulesToUpdate = importedModules.Except(updatedModules).ToList();
+                if (!modulesToUpdate.Any())
+                    break;
+
+                foreach (var type in modulesToUpdate.SelectMany(module => module.GetTypes().Where(t => t.Name != "<Module>")))
+                {
+                    codeImporter.ImportType(type, null);
+                }
+
+                updatedModules = new HashSet<ModuleDefinition>(updatedModules.Concat(modulesToUpdate));
+                importedModules = codeImporter.ListImportedModules();
+            }
+
+            return importedModules;
         }
 
         private static void ImportResources([NotNull] ModuleDefinition targetModule, [NotNull, ItemNotNull] IEnumerable<ModuleDefinition> importedModules, [CanBeNull] Regex includeResources, [CanBeNull] Regex excludeResources, [NotNull] ILogger logger)
