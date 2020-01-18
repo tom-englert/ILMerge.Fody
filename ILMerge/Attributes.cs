@@ -106,4 +106,46 @@ namespace ILMerge
         /// </summary>
         public bool Value { get; }
     }
+
+    /// <summary>
+    /// A string that is used as prefix for the namespace of the imported types..
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class NamespacePrefixAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExcludeResourcesAttribute"/> class.
+        /// </summary>
+        /// <param name="prefix">The prefix.</param>
+        public NamespacePrefixAttribute(string prefix)
+        {
+            Prefix = prefix;
+        }
+
+        /// <summary>
+        /// Gets the regular expression pattern.
+        /// </summary>
+        public string Prefix { get; }
+    }
+
+    /// <summary>
+    /// A switch to control whether to import the full assemblies or only the referenced types. Default is 'false'
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class FullImportAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HideImportedTypesAttribute"/> class.
+        /// </summary>
+        /// <param name="value">if set to <c>true</c>, all types of the referenced assemblies are imported.</param>
+        public FullImportAttribute(bool value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether imported types are hidden (private/internal).
+        /// </summary>
+        public bool Value { get; }
+    }
 }
