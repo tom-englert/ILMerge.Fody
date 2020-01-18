@@ -151,3 +151,22 @@ e.g.
 ```xml
 <ILMerge HideImportedTypes='false' />
 ```
+
+### NamespacePrefix
+
+A string that is used as prefix for the namespace of the imported types.
+
+e.g.
+```xml
+<ILMerge NamespacePrefix='$_' />
+```
+
+### FullImport
+
+A switch to control whether to import the full assemblies or only the referenced types. Default is 'false'
+
+e.g.
+
+```xml
+<ILMerge FullImport='true' />
+```
