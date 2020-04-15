@@ -8,8 +8,6 @@ namespace Tests
 {
     using System;
 
-    using JetBrains.Annotations;
-
     using TomsToolbox.Core;
     using Xunit;
 
@@ -59,17 +57,16 @@ namespace Tests
         where T1 : TomsToolbox.Core.DelegateComparer<T2>
         where T2 : class, TomsToolbox.Core.ITimeService
     {
-        public SomeComplexSample([NotNull] T1 target, [NotNull] T2 source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
+        public SomeComplexSample(T1 target, T2 source, Action<T1, object, EventArgs> onEventAction, Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
             : base(target, source, onEventAction, onAttachAction, onDetachAction)
         {
         }
 
-        public SomeComplexSample([NotNull] T1 target, [NotNull] TomsToolbox.Core.WeakReference<T2> source, [NotNull] Action<T1, object, EventArgs> onEventAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, [NotNull] Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
+        public SomeComplexSample(T1 target, TomsToolbox.Core.WeakReference<T2> source, Action<T1, object, EventArgs> onEventAction, Action<WeakEventListener<T1, T2, EventArgs>, T2> onAttachAction, Action<WeakEventListener<T1, T2, EventArgs>, T2> onDetachAction)
             : base(target, source, onEventAction, onAttachAction, onDetachAction)
         {
         }
 
-        [CanBeNull]
         public T SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1)
             where T : TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>
         {

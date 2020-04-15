@@ -1,22 +1,23 @@
-﻿#define LAUNCH_DEBUGGER
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Xml;
-using Fody;
-using FodyTools;
-using JetBrains.Annotations;
-using Mono.Cecil;
+﻿// #define LAUNCH_DEBUGGER
 
 namespace ILMerge.Fody
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using System.Xml;
+
+    using FodyTools;
+
+    using global::Fody;
+
+    using Mono.Cecil;
+
     public class ModuleWeaver : AbstractModuleWeaver
     {
-        [NotNull]
         public override IEnumerable<string> GetAssembliesForScanning() => Enumerable.Empty<string>();
 
         public override bool ShouldCleanReference => true;
@@ -84,7 +85,7 @@ namespace ILMerge.Fody
             return importedModules;
         }
 
-        private static void ImportResources([NotNull] ModuleDefinition targetModule, [NotNull, ItemNotNull] IEnumerable<ModuleDefinition> importedModules, [CanBeNull] Regex includeResources, [CanBeNull] Regex excludeResources, [NotNull] ILogger logger)
+        private static void ImportResources(ModuleDefinition targetModule, IEnumerable<ModuleDefinition> importedModules, Regex? includeResources, Regex? excludeResources, ILogger logger)
         {
             foreach (var resource in importedModules.SelectMany(module => module.Resources.OfType<EmbeddedResource>()))
             {
@@ -107,8 +108,7 @@ namespace ILMerge.Fody
             }
         }
 
-        [NotNull]
-        private string ReadConfigValue([NotNull] string name, [NotNull] string defaultValue)
+        private string ReadConfigValue(string name, string defaultValue)
         {
             var customAttributes = ModuleDefinition.Assembly.CustomAttributes;
             var attribute = customAttributes.FirstOrDefault(item => item.AttributeType.FullName == $"ILMerge.{name}Attribute");
@@ -133,8 +133,7 @@ namespace ILMerge.Fody
             }
         }
 
-        [CanBeNull]
-        private static Regex BuildRegex(string pattern)
+        private static Regex? BuildRegex(string pattern)
         {
             try
             {
@@ -148,18 +147,13 @@ namespace ILMerge.Fody
 
         private class LocalReferenceModuleResolver : IModuleResolver
         {
-            [NotNull]
             private readonly ILogger _logger;
-            [CanBeNull]
-            private readonly Regex _includes;
-            [CanBeNull]
-            private readonly Regex _excludes;
-            [NotNull]
+            private readonly Regex? _includes;
+            private readonly Regex? _excludes;
             private readonly HashSet<string> _referencePaths;
-            [NotNull]
             private readonly HashSet<string> _ignoredAssemblyNames = new HashSet<string>();
 
-            public LocalReferenceModuleResolver([NotNull] ILogger logger, [NotNull] IEnumerable<string> referencePaths, [CanBeNull] Regex includes, [CanBeNull] Regex excludes)
+            public LocalReferenceModuleResolver(ILogger logger, IEnumerable<string> referencePaths, Regex? includes, Regex? excludes)
             {
                 _logger = logger;
                 _includes = includes;
@@ -168,8 +162,7 @@ namespace ILMerge.Fody
                 _referencePaths = new HashSet<string>(referencePaths, StringComparer.OrdinalIgnoreCase);
             }
 
-            [CanBeNull]
-            public ModuleDefinition Resolve(TypeReference typeReference, string assemblyName)
+            public ModuleDefinition? Resolve(TypeReference typeReference, string assemblyName)
             {
                 if (_ignoredAssemblyNames.Contains(assemblyName))
                     return null;
@@ -209,8 +202,7 @@ namespace ILMerge.Fody
 
     static class ExtensionMethods
     {
-        [CanBeNull]
-        public static string GetTargetFramework([NotNull] this ModuleDefinition moduleDefinition)
+        public static string? GetTargetFramework(this ModuleDefinition moduleDefinition)
         {
             return moduleDefinition.Assembly
                 .CustomAttributes
@@ -219,7 +211,7 @@ namespace ILMerge.Fody
                 .FirstOrDefault();
         }
 
-        public static bool IsTargetFrameworkDotNetCore([NotNull] this ModuleDefinition moduleDefinition)
+        public static bool IsTargetFrameworkDotNetCore(this ModuleDefinition moduleDefinition)
         {
             var targetFramework = moduleDefinition.GetTargetFramework();
 
