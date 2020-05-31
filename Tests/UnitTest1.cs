@@ -67,7 +67,7 @@ namespace Tests
         {
         }
 
-        public T SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1)
+        public T? SomeMethod<T>(TomsToolbox.Core.TryCastWorker<T> p1)
             where T : TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>
         {
             var x = new AutoWeakIndexer<int, string>(i => i.ToString());
@@ -85,7 +85,7 @@ namespace Tests
 
         public void AnotherMethod()
         {
-            var y = default(TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>).TryCast();
+            var y = default(TomsToolbox.Core.DelegateComparer<AutoWeakIndexer<int, string>>)!.TryCast();
 
             var x = SomeMethod(y);
         }
