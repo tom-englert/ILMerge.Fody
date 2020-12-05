@@ -38,7 +38,7 @@ namespace ILMerge.Fody
 
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
 
-            var references = isDotNetCore ? References.Split(';') : ReferenceCopyLocalPaths;
+            var references = isDotNetCore ? (IList<string>)References.Split(';') : ReferenceCopyLocalPaths;
 
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
