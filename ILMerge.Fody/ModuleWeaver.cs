@@ -87,23 +87,33 @@ namespace ILMerge.Fody
 
         private static void ImportResources(ModuleDefinition targetModule, IEnumerable<ModuleDefinition> importedModules, Regex? includeResources, Regex? excludeResources, ILogger logger)
         {
-            foreach (var resource in importedModules.SelectMany(module => module.Resources.OfType<EmbeddedResource>()))
+            foreach (var module in importedModules)
             {
-                var resourceName = resource.Name;
+                var moduleResourceName = Path.ChangeExtension(module.Name, null) + ".g.resources";
 
-                if (excludeResources?.Match(resourceName).Success == true)
+                foreach (var resource in module.Resources.OfType<EmbeddedResource>())
                 {
-                    logger.LogInfo($"Exclude resource {resourceName} because its in the exclude list.");
-                }
-                else if (includeResources?.Match(resourceName).Success == false)
-                {
-                    logger.LogInfo($"Exclude resource {resourceName} because its not in the include list.");
-                }
-                else
-                {
-                    logger.LogInfo($"Merge resource {resourceName}.");
+                    var resourceName = resource.Name;
 
-                    targetModule.Resources.Add(resource);
+                    if (resourceName.Equals(moduleResourceName, StringComparison.OrdinalIgnoreCase) && includeResources?.Match(resourceName).Success != true)
+                    {
+                        continue;
+                    }
+
+                    if (excludeResources?.Match(resourceName).Success == true)
+                    {
+                        logger.LogInfo($"Exclude resource {resourceName} because its in the exclude list.");
+                    }
+                    else if (includeResources?.Match(resourceName).Success == false)
+                    {
+                        logger.LogInfo($"Exclude resource {resourceName} because its not in the include list.");
+                    }
+                    else
+                    {
+                        logger.LogInfo($"Merge resource {resourceName}.");
+
+                        targetModule.Resources.Add(resource);
+                    }
                 }
             }
         }
