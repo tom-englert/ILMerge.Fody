@@ -2,3 +2,7 @@
 	path = FodyTools
 	url = https://github.com/tom-englert/FodyTools.git
 	branch = master
+[submodule "BAML"]
+	path = BAML
+	url = https://github.com/tom-englert/BAML.git
+	branch = master

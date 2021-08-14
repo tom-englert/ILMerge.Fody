@@ -1,0 +1,20 @@
+﻿<Window x:Class="Tests.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Window" Height="450" Width="800">
+  <!--
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:toms="urn:TomsToolbox"
+  -->
+  <Grid>
+    <!-- enabling this code should cause ILMerge to fail with: Target assembly contains XAML references to merged assemblies. This will probably fail at runtime! -->
+    <!--
+    <b:Interaction.Behaviors>
+       <toms:PopupFocusManagerBehavior /> 
+    </b:Interaction.Behaviors>
+    -->
+  </Grid>
+</Window>

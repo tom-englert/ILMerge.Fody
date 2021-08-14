@@ -1,21 +1,25 @@
 ﻿// #define LAUNCH_DEBUGGER
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Resources;
+using System.Text.RegularExpressions;
+using System.Xml;
+
+using Baml;
+
+using Fody;
+
+using FodyTools;
+
+using Mono.Cecil;
+
 namespace ILMerge.Fody
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using System.Xml;
-
-    using FodyTools;
-
-    using global::Fody;
-
-    using Mono.Cecil;
-
     public class ModuleWeaver : AbstractModuleWeaver
     {
         public override IEnumerable<string> GetAssembliesForScanning() => Enumerable.Empty<string>();
@@ -55,6 +59,8 @@ namespace ILMerge.Fody
             {
                 importedModules = ImportRemainingTypes(importedModules, codeImporter);
             }
+
+            ValidateBamlReferences(ModuleDefinition, importedModules);
 
             ImportResources(ModuleDefinition, importedModules, includeResources, excludeResources, this);
 
@@ -113,6 +119,38 @@ namespace ILMerge.Fody
                         logger.LogInfo($"Merge resource {resourceName}.");
 
                         targetModule.Resources.Add(resource);
+                    }
+                }
+            }
+        }
+
+        private static void ValidateBamlReferences(ModuleDefinition targetAssembly, IEnumerable<ModuleDefinition> importedModules)
+        {
+            var importedAssemblyNames = new HashSet<string>(importedModules.Select(module => module.Assembly.FullName));
+            var assemblyResources = targetAssembly.Resources?.OfType<EmbeddedResource>().FirstOrDefault(res => res.Name?.EndsWith("g.resources", StringComparison.Ordinal) == true);
+
+            var resourceStream = assemblyResources?.GetResourceStream();
+            if (resourceStream == null)
+                return;
+
+            using (var resourceReader = new ResourceReader(resourceStream))
+            {
+                foreach (DictionaryEntry entry in resourceReader)
+                {
+                    if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
+                        continue;
+
+                    if (!(entry.Value is Stream bamlStream))
+                        continue;
+
+                    var records = Baml.Baml.ReadDocument(bamlStream);
+
+                    foreach (var name in records.OfType<AssemblyInfoRecord>().Select(ai => ai.AssemblyFullName))
+                    {
+                        if (importedAssemblyNames.Contains(name))
+                        {
+                            throw new WeavingException("Target assembly contains XAML references to merged assemblies. This will probably fail at runtime!");
+                        }
                     }
                 }
             }
