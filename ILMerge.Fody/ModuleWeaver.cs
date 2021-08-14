@@ -3,14 +3,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Text.RegularExpressions;
 using System.Xml;
-
-using Baml;
 
 using Fody;
 
@@ -133,19 +132,16 @@ namespace ILMerge.Fody
             if (resourceStream == null)
                 return;
 
-            using (var resourceReader = new ResourceReader(resourceStream))
+            using var resourceReader = new ResourceReader(resourceStream);
+
+            foreach (var entry in resourceReader.Cast<DictionaryEntry>().Where(entry => (entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) == true))
             {
-                foreach (DictionaryEntry entry in resourceReader)
+                if (entry.Value is not Stream bamlStream)
+                    continue;
+
+                if (TryReadBamlDocument(bamlStream, out var records))
                 {
-                    if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
-                        continue;
-
-                    if (!(entry.Value is Stream bamlStream))
-                        continue;
-
-                    var records = Baml.Baml.ReadDocument(bamlStream);
-
-                    foreach (var name in records.OfType<AssemblyInfoRecord>().Select(ai => ai.AssemblyFullName))
+                    foreach (var name in records.OfType<Baml.AssemblyInfoRecord>().Select(ai => ai.AssemblyFullName))
                     {
                         if (importedAssemblyNames.Contains(name))
                         {
@@ -154,6 +150,21 @@ namespace ILMerge.Fody
                     }
                 }
             }
+        }
+
+        private static bool TryReadBamlDocument(Stream stream, [NotNullWhen(true)] out IList<Baml.BamlRecord>? records)
+        {
+            try
+            {
+                records = Baml.Baml.ReadDocument(stream);
+                return true;
+            }
+            catch
+            {
+                records = null;
+                return false;
+            }
+
         }
 
         private string ReadConfigValue(string name, string defaultValue)

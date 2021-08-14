@@ -8,7 +8,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GitHubOrganization>tom-englert</GitHubOrganization>
     <PackageId>$(MSBuildProjectName).Fody</PackageId>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
     <Nullable>enable</Nullable>
   </PropertyGroup>
