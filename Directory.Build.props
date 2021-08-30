@@ -2,9 +2,9 @@
 <Project>
 
   <PropertyGroup>
-    <Copyright>Copyright © tom-englert.de 2017-2020. Distributed under the MIT License.</Copyright>
+    <Copyright>Copyright © tom-englert.de 2017-2021. Distributed under the MIT License.</Copyright>
     <Product>ILMerge.Fody</Product>
-    <Version>1.17.0</Version>
+    <Version>1.18.0</Version>
     <Description>Merges the referenced types of local dependencies as private types into the target assembly, and removes the references to the local dependencies.</Description>
   </PropertyGroup>
 
