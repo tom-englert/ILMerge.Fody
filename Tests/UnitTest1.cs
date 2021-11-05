@@ -2,8 +2,11 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedVariable
 
-[assembly: ILMerge.IncludeAssemblies("TomsToolbox")]
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+[assembly: ILMerge.IncludeAssemblies("TomsToolbox|WindowsAPICodePack")]
 [assembly: ILMerge.HideImportedTypes(false)]
+[assembly: ILMerge.CompactMode(true)]
 
 namespace Tests
 {
@@ -20,6 +23,13 @@ namespace Tests
         public void Test()
         {
             Assert.True(_indexer.GetType().Assembly == typeof(UnitTest1).Assembly);
+        }
+
+        private void Dummy()
+        {
+            using var dlg = new CommonOpenFileDialog { IsFolderPicker = true, InitialDirectory = ".", EnsurePathExists = true };
+            if (dlg.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
         }
     }
 

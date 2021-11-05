@@ -175,3 +175,13 @@ e.g.
 ```xml
 <ILMerge FullImport='true' />
 ```
+
+### CompactMode
+
+A switch to control whether to compact the target assembly by skipping properties, events and unused methods. Default is 'false'
+
+e.g.
+
+```xml
+<ILMerge CompactMode='true' />
+```

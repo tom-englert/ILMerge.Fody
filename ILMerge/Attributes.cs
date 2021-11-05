@@ -114,7 +114,7 @@ namespace ILMerge
     public class NamespacePrefixAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExcludeResourcesAttribute"/> class.
+        /// Initializes a new instance of the <see cref="NamespacePrefixAttribute"/> class.
         /// </summary>
         /// <param name="prefix">The prefix.</param>
         public NamespacePrefixAttribute(string prefix)
@@ -135,7 +135,7 @@ namespace ILMerge
     public class FullImportAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HideImportedTypesAttribute"/> class.
+        /// Initializes a new instance of the <see cref="FullImportAttribute"/> class.
         /// </summary>
         /// <param name="value">if set to <c>true</c>, all types of the referenced assemblies are imported.</param>
         public FullImportAttribute(bool value)
@@ -145,6 +145,27 @@ namespace ILMerge
 
         /// <summary>
         /// Gets a value indicating whether imported types are hidden (private/internal).
+        /// </summary>
+        public bool Value { get; }
+    }
+
+    /// <summary>
+    /// A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class CompactModeAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompactModeAttribute"/> class.
+        /// </summary>
+        /// <param name="value">A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.</param>
+        public CompactModeAttribute(bool value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
+        /// A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.
         /// </summary>
         public bool Value { get; }
     }
