@@ -178,7 +178,7 @@ e.g.
 
 ### CompactMode
 
-A switch to control whether to compact the target assembly by skipping properties, events and unused methods. Default is 'false'
+A switch to enable compacting of the target assembly by skipping properties, events and unused methods. Default is 'false'
 
 e.g.
 

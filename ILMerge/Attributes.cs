@@ -150,7 +150,7 @@ namespace ILMerge
     }
 
     /// <summary>
-    /// A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.
+    /// A switch to enable compacting of the target assembly by skipping properties, events and unused static methods.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
     public class CompactModeAttribute : Attribute
@@ -158,14 +158,14 @@ namespace ILMerge
         /// <summary>
         /// Initializes a new instance of the <see cref="CompactModeAttribute"/> class.
         /// </summary>
-        /// <param name="value">A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.</param>
+        /// <param name="value">A switch to enable compacting of the target assembly by skipping properties, events and unused methods.</param>
         public CompactModeAttribute(bool value)
         {
             Value = value;
         }
 
         /// <summary>
-        /// A switch to control whether to compact the target assembly by skipping properties, events and unused static methods.
+        /// A switch to enable compacting of the target assembly by skipping properties, events and unused methods.
         /// </summary>
         public bool Value { get; }
     }
