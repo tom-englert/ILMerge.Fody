@@ -37,7 +37,7 @@ namespace ILMerge.Fody
             var excludeResources = BuildRegex(ReadConfigValue("ExcludeResources", string.Empty));
             var hideImportedTypes = ReadConfigValue("HideImportedTypes", true);
             var namespacePrefix = ReadConfigValue("NamespacePrefix", string.Empty);
-            var compactMode = ReadConfigValue("CompactMode", true);
+            var compactMode = ReadConfigValue("CompactMode", false);
             var fullImport = ReadConfigValue("FullImport", false);
 
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();

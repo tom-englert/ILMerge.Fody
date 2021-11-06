@@ -178,10 +178,10 @@ e.g.
 
 ### CompactMode
 
-A switch to control whether to compact the target assembly by skipping properties, events and unused methods. Default is 'true'
+A switch to control whether to compact the target assembly by skipping properties, events and unused methods. Default is 'false'
 
 e.g.
 
 ```xml
-<ILMerge CompactMode='false' />
+<ILMerge CompactMode='true' />
 ```
