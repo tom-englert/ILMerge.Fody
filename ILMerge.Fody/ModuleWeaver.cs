@@ -37,36 +37,19 @@ namespace ILMerge.Fody
             var excludeResources = BuildRegex(ReadConfigValue("ExcludeResources", string.Empty));
             var hideImportedTypes = ReadConfigValue("HideImportedTypes", true);
             var namespacePrefix = ReadConfigValue("NamespacePrefix", string.Empty);
-            var compactMode = ReadConfigValue("CompactMode", false);
+            var compactMode = ReadConfigValue("CompactMode", true);
             var fullImport = ReadConfigValue("FullImport", false);
 
             var isDotNetCore = ModuleDefinition.IsTargetFrameworkDotNetCore();
 
             var references = isDotNetCore ? (IList<string>)References.Split(';') : ReferenceCopyLocalPaths;
 
-            static bool CanDeferMethodImport(MethodDefinition method)
-            {
-                if (method.IsConstructor)
-                    return false;
-
-                if (method.IsStatic)
-                    return true;
-
-                var declaringType = method.DeclaringType;
-
-                if (declaringType.IsInterface || declaringType.IsValueType || method.IsAbstract || method.IsVirtual || method.IsPInvokeImpl)
-                    return false;
-
-                return true;
-            }
-
             var codeImporter = new CodeImporter(ModuleDefinition)
             {
                 ModuleResolver = new LocalReferenceModuleResolver(this, references, includeAssemblies, excludeAssemblies),
                 HideImportedTypes = hideImportedTypes,
                 NamespaceDecorator = name => namespacePrefix + name,
-                SkipPropertiesAndEvents = compactMode,
-                DeferMethodImport = compactMode ? CanDeferMethodImport : _ => false
+                CompactMode = compactMode && !fullImport,
             };
 
             codeImporter.ILMerge();
