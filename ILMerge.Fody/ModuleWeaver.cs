@@ -67,7 +67,13 @@ namespace ILMerge.Fody
 
             var importedReferences = new HashSet<string>(importedModules.Select(moduleDefinition => Path.GetFileNameWithoutExtension(moduleDefinition.FileName)), StringComparer.OrdinalIgnoreCase);
 
-            ReferenceCopyLocalPaths.RemoveAll(path => importedReferences.Contains(Path.GetFileNameWithoutExtension(path)));
+            bool IsImportedReference(string path)
+            {
+                return importedReferences.Contains(Path.GetFileNameWithoutExtension(path));
+            }
+
+            ReferenceCopyLocalPaths.RemoveAll(IsImportedReference);
+            RuntimeCopyLocalPaths.RemoveAll(IsImportedReference);
         }
 
         private static ICollection<ModuleDefinition> ImportRemainingTypes(ICollection<ModuleDefinition> importedModules, CodeImporter codeImporter)
