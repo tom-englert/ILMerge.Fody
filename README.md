@@ -59,7 +59,7 @@ This Task performs the following changes
 
 ## .NET Core support
 
-Since .NET Core projects do not mark references as "Coly Local", ILMerge.Fody will instead try to merge all references. 
+Since .NET Core projects do not mark references as "Copy Local", ILMerge.Fody will instead try to merge all references. 
 **Make sure to use the configuration options to exclude system libraries from being merged!**
 
 
